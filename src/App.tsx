@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.global.css';
 import { BsFileDiff, BsFileText, BsImage } from 'react-icons/bs';
@@ -6,17 +6,14 @@ import { BiCommand } from 'react-icons/bi';
 import fuzzysort from 'fuzzysort';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { SiVisualstudiocode } from 'react-icons/si';
 
 // In renderer process (web page).
 const { ipcRenderer } = require('electron');
 
 const ClipViewer = ({ clip }: { clip: Clip }) => {
   return (
-    <div
-      style={{
-        whiteSpace: 'pre-line',
-      }}
-    >
+    <div style={{ height: '100%' }}>
       {clip.type === 'image' && (
         <img
           alt="Copied"
@@ -26,7 +23,11 @@ const ClipViewer = ({ clip }: { clip: Clip }) => {
       )}
 
       {clip.type === 'code' && (
-        <SyntaxHighlighter language="javascript" style={tomorrow}>
+        <SyntaxHighlighter
+          customStyle={{ height: '100%' }}
+          codeTagProps={{ height: '100%' }}
+          style={tomorrow}
+        >
           {clip.contents}
         </SyntaxHighlighter>
       )}
@@ -77,14 +78,18 @@ const ClipboardItem = ({
       <div className="flex items-center">
         <div className="min-w-4">
           {clip.type === 'text' && (
-            <BsFileText className="text-lg text-indigo-500 mr-1" />
+            <BsFileText className="text-lg text-gray-400 mr-1" />
           )}
           {clip.type === 'html' && (
-            <BsFileDiff className="text-lg text-gray-500 mr-1" />
+            <BsFileDiff className="text-lg text-indigo-500 mr-1" />
           )}
 
           {clip.type === 'image' && (
-            <BsImage className="text-lg text-green-500 mr-1" />
+            <BsImage className="text-lg text-pink-500 mr-1" />
+          )}
+
+          {clip.type === 'code' && (
+            <SiVisualstudiocode className="text-lg text-blue-500 mr-1" />
           )}
         </div>
 
@@ -94,6 +99,7 @@ const ClipboardItem = ({
             WebkitLineClamp: 1,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
+            maxWidth: 295,
           }}
         >
           {clip.label}

@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell, globalShortcut } from 'electron';
+import { app, BrowserWindow, shell, globalShortcut, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -26,6 +26,8 @@ export default class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+
+app.dock.hide();
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -52,6 +54,22 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+function showWindow(win: BrowserWindow) {
+  // Get mouse cursor absolute position
+  const { x, y } = screen.getCursorScreenPoint();
+  // Find the display where the mouse cursor will be
+  const currentDisplay = screen.getDisplayNearestPoint({ x, y });
+  // Set window position to that display coordinates
+  win.setPosition(currentDisplay.workArea.x, currentDisplay.workArea.y);
+
+  console.log(x, y, currentDisplay.workArea);
+  // Center window relatively to that display
+  win.center();
+  // Display the window
+  win.show();
+  win.focus();
+}
+
 const createWindow = async () => {
   if (
     process.env.NODE_ENV === 'development' ||
@@ -76,13 +94,18 @@ const createWindow = async () => {
     fullscreenable: false,
     resizable: false,
     frame: false,
-    icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
     },
   });
 
+  mainWindow.setVisibleOnAllWorkspaces(true)
+
   mainWindow.loadURL(`file://${__dirname}/index.html`);
+
+  mainWindow.on('blur', () => {
+    mainWindow?.hide();
+  });
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -91,10 +114,9 @@ const createWindow = async () => {
       throw new Error('"mainWindow" is not defined');
     }
     if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
+      mainWindow.hide();
     } else {
-      mainWindow.show();
-      mainWindow.focus();
+      showWindow(mainWindow);
     }
   });
 
@@ -113,11 +135,13 @@ const createWindow = async () => {
 
   globalShortcut.register('CommandOrControl+Shift+Space', () => {
     console.log('visible?', mainWindow?.isVisible());
-    
-    if (mainWindow?.isVisible()) {
-      mainWindow?.minimize();
+
+    if (!mainWindow) return;
+
+    if (mainWindow.isVisible()) {
+      mainWindow?.hide();
     } else {
-      mainWindow?.show();
+      showWindow(mainWindow);
     }
   });
 

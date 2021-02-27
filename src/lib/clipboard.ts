@@ -53,7 +53,8 @@ export function startMonitoringClipboard(bw: BrowserWindow) {
   });
 
   ipcMain.on('WRITE_CLIP', (_, { clip }: { clip: Clip }) => {
-    bw.minimize();
+    bw.hide();
+
     if (clip.type === 'image') {
       clipboard.writeImage(nativeImage.createFromDataURL(clip.contents));
     } else if (clip.type === 'html') {
