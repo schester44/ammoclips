@@ -20,3 +20,4 @@ A beautifully simple self hosted clipboard manager
 - Settings
 - Bug Fixes (arrow key nav is buggy)
 - Cloud Sync (optional shared clipboard across multiple devices)
+- Purge unused TailwindCSS styles
