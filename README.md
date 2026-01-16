@@ -1,6 +1,6 @@
 # Ammo
 
-A beautifully simple self hosted clipboard manager
+A beautifully simple self-hosted clipboard manager
 
 ![Ammo - beautifully simple clipboard manager](https://github.com/schester44/ammoclips/blob/master/screenshot.png?raw=true)
 
